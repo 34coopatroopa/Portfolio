@@ -6,374 +6,239 @@
   <title>Cooper Hoy | Infrastructure Engineer</title>
 
   <script src="https://cdn.tailwindcss.com"></script>
+
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             cyber: {
-              green: '#00ff88', blue: '#00ccff', amber: '#ffaa00',
-              red: '#ff3355', purple: '#aa44ff',
+              green: '#00ff88',
+              blue: '#00ccff',
+              amber: '#ffaa00'
             }
           },
           fontFamily: {
-            mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
-            sans: ['"Inter"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            sans: ['"Inter"', 'system-ui', 'sans-serif']
           }
         }
       }
     }
   </script>
 
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { overflow-x: hidden; }
     body {
-      background: #152238;
-      color: #e0e0f0;
-      font-family: 'Inter', system-ui, sans-serif;
-      overflow-x: hidden;
+      background: #0f172a;
+      color: #e5e7eb;
+      font-family: 'Inter', sans-serif;
     }
-
-    #three-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 1;
-    }
-
-    #ui-layer {
-      position: relative;
-      z-index: 10;
-      pointer-events: none;
-    }
-    #ui-layer * { pointer-events: auto; }
-
-    .server-section { height: 100vh; position: relative; }
-
-    .server-panel {
-      position: absolute;
-      right: 5vw;
-      top: 50%;
-      transform: translateY(-50%) translateX(30px);
-      width: min(480px, 36vw);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-    .server-panel.active {
-      opacity: 1;
-      transform: translateY(-50%) translateX(0);
-      pointer-events: auto;
-    }
-
-    .glitch { position: relative; animation: glitch-skew 6s infinite linear alternate-reverse; }
-    .glitch::before, .glitch::after {
-      content: attr(data-text); position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    }
-    .glitch::before { color: #00ccff; animation: g1 4s infinite linear alternate-reverse; clip-path: polygon(0 0,100% 0,100% 33%,0 33%); z-index: -1; }
-    .glitch::after { color: #ff3355; animation: g2 3s infinite linear alternate-reverse; clip-path: polygon(0 66%,100% 66%,100% 100%,0 100%); z-index: -1; }
-    @keyframes g1 { 0%,92%{transform:translate(0)}93%{transform:translate(-3px,1px)}95%,100%{transform:translate(0)} }
-    @keyframes g2 { 0%,90%{transform:translate(0)}91%{transform:translate(2px,1px)}93%,100%{transform:translate(0)} }
-    @keyframes glitch-skew { 0%,96%{transform:skew(0)}97%{transform:skew(0.4deg)}99%,100%{transform:skew(0)} }
-
-    @keyframes pulse-glow { 0%,100%{opacity:1;text-shadow:0 0 20px rgba(0,255,136,0.6)}50%{opacity:0.7;text-shadow:0 0 10px rgba(0,255,136,0.3)} }
-    @keyframes float-arrow { 0%,100%{transform:translateY(0)}50%{transform:translateY(10px)} }
-    .float-anim { animation: float-arrow 2s ease-in-out infinite; }
-    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
 
     .glass-card {
-      background: rgba(10, 14, 30, 0.82);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid rgba(0, 204, 255, 0.1);
-      box-shadow: 0 0 60px rgba(0,0,0,0.5), 0 0 100px rgba(0,204,255,0.02), inset 0 1px 0 rgba(255,255,255,0.03);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.05);
     }
 
-    .skill-pill { transition: all 0.2s ease; }
-    .skill-pill:hover {
-      background: rgba(0,204,255,0.15); border-color: rgba(0,204,255,0.5);
-      transform: translateY(-1px); box-shadow: 0 4px 15px rgba(0,204,255,0.1);
-    }
-
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: #152238; }
-    ::-webkit-scrollbar-thumb { background: #1a2040; border-radius: 3px; }
-
-    #loading {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: #152238; z-index: 99999;
-      display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 1.5rem; transition: opacity 0.8s ease;
-    }
-    #loading.hidden { opacity: 0; pointer-events: none; }
-    .load-bar { width: 200px; height: 2px; background: #1a2040; border-radius: 1px; overflow: hidden; }
-    .load-bar-inner { height: 100%; width: 0%; background: linear-gradient(90deg,#00ff88,#00ccff); border-radius: 1px; transition: width 0.3s ease; }
-
-    .spin-hint {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 50;
-      transition: opacity 0.5s ease;
+    /* Mobile Optimizations */
+    @media (max-width: 768px) {
+      #three-canvas {
+        display: none;
+      }
     }
   </style>
 </head>
+
 <body>
 
-  <div id="loading">
-    <p class="font-mono text-sm text-cyber-green tracking-[4px]">INITIALIZING SYSTEMS</p>
-    <div class="load-bar"><div class="load-bar-inner" id="load-progress"></div></div>
-    <p class="font-mono text-xs text-gray-600" id="load-status">Loading assets...</p>
-  </div>
+  <!-- HERO -->
+  <section class="min-h-screen flex items-center justify-center text-center px-6">
+    <div class="max-w-3xl">
+      <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
+        Cooper Hoy
+      </h1>
 
-  <canvas id="three-canvas"></canvas>
+      <p class="text-cyber-blue uppercase tracking-wide text-sm mb-4">
+        Infrastructure Engineer | Cyber Security Engineering Student
+      </p>
 
-  <div id="ui-layer">
+      <p class="text-gray-400 leading-relaxed mb-8">
+        I build secure virtualization environments, hardened identity systems, 
+        and production infrastructure focused on uptime and resilience.
+      </p>
 
-    <!-- HERO -->
-    <section id="hero" class="h-screen flex items-center justify-center text-center relative">
-      <div>
-        <p class="font-mono text-sm text-cyber-green tracking-[6px] mb-4 pulse-glow">~/cooper $</p>
-        <h1 class="glitch font-mono text-6xl md:text-8xl lg:text-9xl font-extrabold tracking-[10px] md:tracking-[16px] text-white" data-text="COOPER HOY">COOPER HOY</h1>
-        <p class="font-mono text-base md:text-lg text-cyber-blue tracking-[6px] uppercase mt-3" style="text-shadow:0 0 20px rgba(0,204,255,0.4);">IT Infrastructure Engineer</p>
-        <p class="text-gray-400 mt-4 text-base font-light max-w-lg mx-auto" id="tagline-text"></p>
-        <div class="mt-16 flex flex-col items-center gap-3 float-anim">
-          <span class="font-mono text-[10px] text-gray-500 tracking-[4px] uppercase">Scroll to breach</span>
-          <svg class="w-5 h-5 text-cyber-green opacity-60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-        </div>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="mailto:cjhoy@iastate.edu"
+           class="px-6 py-3 rounded bg-cyber-blue text-black font-semibold hover:opacity-90 transition">
+           Contact Me
+        </a>
+
+        <a href="https://www.linkedin.com/in/cooperhoy"
+           target="_blank"
+           class="px-6 py-3 rounded border border-white/20 hover:border-cyber-blue transition">
+           LinkedIn
+        </a>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- RACK INTRO -->
-    <section id="rack-intro" class="server-section"></section>
+  <!-- WHAT I BUILD -->
+  <section class="py-20 px-6 text-center border-t border-white/5">
+    <div class="max-w-3xl mx-auto">
+      <h2 class="text-2xl font-semibold text-white mb-6">
+        What I Build
+      </h2>
 
-    <!-- 0: About (Dell-style 2U) -->
-    <section id="section-0" class="server-section">
-      <div class="server-panel" id="panel-0">
-        <div class="glass-card rounded-xl p-7">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-2 h-2 rounded-full bg-cyber-green shadow-[0_0_8px_rgba(0,255,136,0.6)]"></div>
-            <h2 class="font-mono text-sm text-cyber-green tracking-[3px]">&gt; whoami</h2>
+      <p class="text-gray-400 leading-relaxed">
+        Secure Windows Server environments deployed in VMware clusters.
+        Hardened Active Directory baselines using Group Policy.
+        Isolated sandbox infrastructure for testing without production risk.
+        Reliable systems engineered for 99.9% uptime.
+      </p>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="py-20 px-6 border-t border-white/5">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-2xl font-semibold text-white mb-10 text-center">
+        Professional Experience
+      </h2>
+
+      <div class="space-y-10">
+
+        <div class="glass-card p-8 rounded-xl">
+          <div class="flex justify-between flex-wrap gap-2 mb-3">
+            <h3 class="text-lg font-semibold text-white">
+              IT Infrastructure Engineer
+            </h3>
+            <span class="text-gray-500 text-sm">
+              2024 – 2026
+            </span>
           </div>
-          <p class="text-gray-400 leading-relaxed text-sm">
-            IT Infrastructure Engineer building hyper-converged environments from the ground up.
-            Currently studying Cyber Security Engineering at Iowa State University while engineering
-            production infrastructure at Cambridge Investments &amp; Research. From VMware clusters
-            to Active Directory hardening &mdash; I build the systems that keep the lights on.
+
+          <p class="text-gray-500 text-sm mb-4">
+            Cambridge Investments & Research • Fairfield, IA
           </p>
-          <div class="flex items-center gap-2 mt-4 text-gray-500 text-xs font-mono">
-            <span class="text-cyber-blue">&#9670;</span> Ames, Iowa
-            <span class="text-gray-700 mx-1">|</span>
-            <span class="text-cyber-green">&#9670;</span> Iowa State University &apos;27
-          </div>
-          <div class="grid grid-cols-3 gap-4 mt-5 pt-5 border-t border-white/[0.06]">
-            <div>
-              <p class="font-mono text-2xl font-bold text-cyber-green" style="text-shadow:0 0 15px rgba(0,255,136,0.4);">99.9%</p>
-              <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mt-1">UPTIME</p>
-            </div>
-            <div>
-              <p class="font-mono text-2xl font-bold text-cyber-blue" style="text-shadow:0 0 15px rgba(0,204,255,0.4);">HCI</p>
-              <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mt-1">TEAM</p>
-            </div>
-            <div>
-              <p class="font-mono text-2xl font-bold text-cyber-amber" style="text-shadow:0 0 15px rgba(255,170,0,0.4);">3+</p>
-              <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mt-1">YRS EXP</p>
-            </div>
-          </div>
+
+          <ul class="text-gray-400 space-y-2 text-sm">
+            <li>Designed and deployed Windows Server 2025 within VMware clusters supporting Active Directory and file services.</li>
+            <li>Built isolated AD sandbox environments to test new products without impacting production systems.</li>
+            <li>Developed and enforced hardened Group Policy baselines across endpoints.</li>
+            <li>Maintained Exchange infrastructure and monitored system health to sustain 99.9% uptime.</li>
+          </ul>
         </div>
-      </div>
-    </section>
 
-    <!-- 1: Skills (Patch Panel) -->
-    <section id="section-1" class="server-section">
-      <div class="server-panel" id="panel-1">
-        <div class="glass-card rounded-xl p-7">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-2 h-2 rounded-full bg-cyber-blue shadow-[0_0_8px_rgba(0,204,255,0.6)]"></div>
-            <h2 class="font-mono text-sm text-cyber-blue tracking-[3px]">&gt; cat skills.conf</h2>
+        <div class="glass-card p-8 rounded-xl">
+          <div class="flex justify-between flex-wrap gap-2 mb-3">
+            <h3 class="text-lg font-semibold text-white">
+              Senior Technical Support Analyst
+            </h3>
+            <span class="text-gray-500 text-sm">
+              2023 – Present
+            </span>
           </div>
-          <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mb-3">PROGRAMMING &amp; TOOLS</p>
-          <div class="grid grid-cols-2 gap-2 mb-4">
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-green mr-2">&#9670;</span>Python</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-blue mr-2">&#9670;</span>Java</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-amber mr-2">&#9670;</span>PowerShell</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-purple mr-2">&#9670;</span>Git / LangChain</div>
-          </div>
-          <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mb-3">SYSTEMS &amp; SECURITY</p>
-          <div class="grid grid-cols-2 gap-2 mb-4">
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-blue mr-2">&#9670;</span>Windows Server</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-green mr-2">&#9670;</span>Linux</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-red mr-2">&#9670;</span>VMware / Hyper-V</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-amber mr-2">&#9670;</span>Active Directory</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-purple mr-2">&#9670;</span>Cryptography / GPO</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-blue mr-2">&#9670;</span>Exchange</div>
-          </div>
-          <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mb-3">INFRASTRUCTURE</p>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-green mr-2">&#9670;</span>Virtualization</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-amber mr-2">&#9670;</span>Datacenter Ops</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-red mr-2">&#9670;</span>Network Config</div>
-            <div class="skill-pill font-mono text-xs text-gray-400 px-3 py-2.5 rounded-md bg-white/[0.02] border border-white/[0.06]"><span class="text-cyber-blue mr-2">&#9670;</span>Scripting / Automation</div>
-          </div>
+
+          <p class="text-gray-500 text-sm mb-4">
+            Iowa State University • Ames, IA
+          </p>
+
+          <ul class="text-gray-400 space-y-2 text-sm">
+            <li>Transitioned the helpdesk to modern tools and workflows, reducing ticket resolution time.</li>
+            <li>Created technical knowledge base documentation improving first-call resolution rates.</li>
+            <li>Collaborated across IT teams to resolve complex incidents and minimize service disruption.</li>
+            <li>Mentored new hires and accelerated onboarding through structured training.</li>
+          </ul>
         </div>
-      </div>
-    </section>
 
-    <!-- 2: Experience (FireEye-style) -->
-    <section id="section-2" class="server-section">
-      <div class="server-panel" id="panel-2">
-        <div class="glass-card rounded-xl p-7">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-2 h-2 rounded-full bg-cyber-amber shadow-[0_0_8px_rgba(255,170,0,0.6)]"></div>
-            <h2 class="font-mono text-sm text-cyber-amber tracking-[3px]">&gt; history --career</h2>
-          </div>
-          <div class="space-y-5">
-            <div class="pl-4 border-l-2 border-cyber-blue/40">
-              <p class="font-mono text-[10px] text-cyber-blue tracking-[2px]">2024 &mdash; 2026</p>
-              <h3 class="text-white font-semibold mt-1">IT Infrastructure Engineer</h3>
-              <p class="text-gray-600 text-xs mt-0.5">Cambridge Investments &amp; Research &bull; Fairfield, IA</p>
-              <p class="text-gray-500 text-sm mt-2 leading-relaxed">Hyper Converged Infrastructure team. Deployed Windows Server 2025 in VMware for AD &amp; file services. Built isolated AD sandbox for product testing. Developed hardening GPOs for new security baselines. Managed Exchange with 99.9% uptime.</p>
-            </div>
-            <div class="pl-4 border-l-2 border-cyber-green/40">
-              <p class="font-mono text-[10px] text-cyber-green tracking-[2px]">2023 &mdash; PRESENT</p>
-              <h3 class="text-white font-semibold mt-1">Senior Technical Support Analyst</h3>
-              <p class="text-gray-600 text-xs mt-0.5">Iowa State University &bull; Ames, IA</p>
-              <p class="text-gray-500 text-sm mt-2 leading-relaxed">Transitioned helpdesk to new tools, cutting ticket resolution time. Built knowledge base articles improving first-call resolution. Mentored new hires, reducing onboarding time.</p>
-            </div>
-          </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="py-20 px-6 border-t border-white/5">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-2xl font-semibold text-white mb-10 text-center">
+        Projects
+      </h2>
+
+      <div class="grid md:grid-cols-2 gap-8">
+
+        <div class="glass-card p-6 rounded-xl">
+          <h3 class="text-cyber-green font-semibold mb-2">
+            W@v3 Encryption
+          </h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-4">
+            Python-based encryption engine that embeds secured data into .wav files using Scrypt key derivation.
+            Includes tamper detection that deletes files after unauthorized salt modification.
+          </p>
+          <p class="text-xs text-gray-500">
+            Python • Scrypt • Steganography
+          </p>
         </div>
-      </div>
-    </section>
 
-    <!-- 3: Projects (Cisco-style) -->
-    <section id="section-3" class="server-section">
-      <div class="server-panel" id="panel-3">
-        <div class="glass-card rounded-xl p-7">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-2 h-2 rounded-full bg-cyber-green shadow-[0_0_8px_rgba(0,255,136,0.6)]"></div>
-            <h2 class="font-mono text-sm text-cyber-green tracking-[3px]">&gt; ls ~/projects</h2>
-          </div>
-          <div class="space-y-3">
-            <div class="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-cyber-green/30 transition-all">
-              <h3 class="font-mono text-sm text-cyber-green font-semibold">W@v3 Encryption</h3>
-              <p class="text-gray-600 text-[10px] font-mono mb-1">wav3.fit &bull; 2025</p>
-              <p class="text-gray-500 text-xs mt-1 leading-relaxed">Data stealth &amp; encryption engine that embeds secured data into .wav audio files using Scrypt key derivation. Tamper detection auto-deletes files after unauthorized salt modification.</p>
-              <div class="flex gap-1.5 mt-2">
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-green/10 text-cyber-green border border-cyber-green/20">Python</span>
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-green/10 text-cyber-green border border-cyber-green/20">Scrypt</span>
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-green/10 text-cyber-green border border-cyber-green/20">Steganography</span>
-              </div>
-            </div>
-            <div class="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-cyber-blue/30 transition-all">
-              <h3 class="font-mono text-sm text-cyber-blue font-semibold">HelpLLama</h3>
-              <p class="text-gray-600 text-[10px] font-mono mb-1">2025</p>
-              <p class="text-gray-500 text-xs mt-1 leading-relaxed">Locally hosted Python chatbot that parses internal docs &amp; ticket history to deliver context-aware support answers. Structured parsing for .docx, .pdf, and .txt.</p>
-              <div class="flex gap-1.5 mt-2">
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/20">Python</span>
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/20">LangChain</span>
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-blue/10 text-cyber-blue border border-cyber-blue/20">LLM</span>
-              </div>
-            </div>
-            <div class="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] hover:border-cyber-amber/30 transition-all">
-              <h3 class="font-mono text-sm text-cyber-amber font-semibold">Enterprise Lab</h3>
-              <p class="text-gray-600 text-[10px] font-mono mb-1">Iowa State University</p>
-              <p class="text-gray-500 text-xs mt-1 leading-relaxed">Deployed full enterprise environment &mdash; LDAP, DNS, domain, web, mail, and security servers. Built for hardening exercises and offensive testing.</p>
-              <div class="flex gap-1.5 mt-2">
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-amber/10 text-cyber-amber border border-cyber-amber/20">LDAP</span>
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-amber/10 text-cyber-amber border border-cyber-amber/20">DNS</span>
-                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyber-amber/10 text-cyber-amber border border-cyber-amber/20">Security</span>
-              </div>
-            </div>
-          </div>
+        <div class="glass-card p-6 rounded-xl">
+          <h3 class="text-cyber-blue font-semibold mb-2">
+            HelpLLama
+          </h3>
+          <p class="text-gray-400 text-sm leading-relaxed mb-4">
+            Locally hosted chatbot that parses internal documentation and ticket history to deliver context-aware support responses.
+            Supports structured parsing for .docx, .pdf, and .txt.
+          </p>
+          <p class="text-xs text-gray-500">
+            Python • LangChain • LLM
+          </p>
         </div>
+
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 4: Education (Storage-style) -->
-    <section id="section-4" class="server-section">
-      <div class="server-panel" id="panel-4">
-        <div class="glass-card rounded-xl p-7">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-2 h-2 rounded-full bg-cyber-amber shadow-[0_0_8px_rgba(255,170,0,0.6)]"></div>
-            <h2 class="font-mono text-sm text-cyber-amber tracking-[3px]">&gt; cat /etc/education</h2>
-          </div>
-          <div class="p-4 rounded-lg bg-white/[0.02] border border-white/[0.05] mb-4">
-            <div class="flex items-center gap-4">
-              <div class="font-mono text-xs font-bold text-cyber-amber bg-cyber-amber/10 border border-cyber-amber/30 px-3 py-2 rounded min-w-[48px] text-center">ISU</div>
-              <div>
-                <p class="text-white text-sm font-medium">B.S. Cyber Security Engineering</p>
-                <p class="text-gray-600 text-xs">Iowa State University &bull; 2023 &mdash; 2027 (est.)</p>
-              </div>
-            </div>
-          </div>
-          <p class="font-mono text-[10px] text-gray-600 tracking-[2px] mb-3">RELEVANT COURSEWORK</p>
-          <div class="space-y-2">
-            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-              <div class="font-mono text-xs font-bold text-cyber-blue bg-cyber-blue/10 border border-cyber-blue/30 px-2.5 py-1.5 rounded text-center">DSA</div>
-              <p class="text-gray-400 text-sm">Data Structures &amp; Algorithms</p>
-            </div>
-            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-              <div class="font-mono text-xs font-bold text-cyber-green bg-cyber-green/10 border border-cyber-green/30 px-2.5 py-1.5 rounded text-center">EMB</div>
-              <p class="text-gray-400 text-sm">Embedded Systems</p>
-            </div>
-            <div class="flex items-center gap-3 p-2.5 rounded-lg bg-white/[0.02] border border-white/[0.05]">
-              <div class="font-mono text-xs font-bold text-cyber-red bg-cyber-red/10 border border-cyber-red/30 px-2.5 py-1.5 rounded text-center">SEC</div>
-              <p class="text-gray-400 text-sm">Intro to Cybersecurity</p>
-            </div>
-          </div>
-        </div>
+  <!-- EDUCATION -->
+  <section class="py-20 px-6 border-t border-white/5">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl font-semibold text-white mb-6">
+        Education
+      </h2>
+
+      <p class="text-white font-medium">
+        B.S. Cyber Security Engineering
+      </p>
+
+      <p class="text-gray-500 mb-4">
+        Iowa State University • 2023 – 2027 (est.)
+      </p>
+
+      <p class="text-gray-400 text-sm">
+        Coursework: Data Structures & Algorithms, Embedded Systems, Intro to Cybersecurity
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="py-20 px-6 border-t border-white/5 text-center">
+    <div class="max-w-xl mx-auto">
+      <h2 class="text-2xl font-semibold text-white mb-6">
+        Contact
+      </h2>
+
+      <p class="text-gray-400 mb-6">
+        Open to infrastructure, cybersecurity, and systems engineering opportunities.
+      </p>
+
+      <div class="space-y-3 text-gray-300">
+        <p>Email: cjhoy@iastate.edu</p>
+        <p>Phone: 319-240-3504</p>
+        <p>Location: Ames, Iowa</p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 5: Contact (UPS-style) -->
-    <section id="section-5" class="server-section">
-      <div class="server-panel" id="panel-5">
-        <div class="glass-card rounded-xl p-7">
-          <div class="flex items-center gap-3 mb-5">
-            <div class="w-2 h-2 rounded-full bg-cyber-blue shadow-[0_0_8px_rgba(0,204,255,0.6)] animate-pulse"></div>
-            <h2 class="font-mono text-sm text-cyber-blue tracking-[3px]">&gt; ping cooper</h2>
-          </div>
-          <div class="grid grid-cols-2 gap-2.5 mb-5">
-            <a href="mailto:cjhoy@iastate.edu" class="flex items-center gap-3 p-3.5 rounded-lg bg-white/[0.02] border border-white/[0.06] hover:border-cyber-blue/40 transition-all group">
-              <span class="text-lg">&#9993;</span><span class="font-mono text-xs text-gray-400 group-hover:text-cyber-blue transition-colors">cjhoy@iastate.edu</span>
-            </a>
-            <a href="tel:+13192403504" class="flex items-center gap-3 p-3.5 rounded-lg bg-white/[0.02] border border-white/[0.06] hover:border-cyber-green/40 transition-all group">
-              <span class="text-lg">&#128222;</span><span class="font-mono text-xs text-gray-400 group-hover:text-cyber-green transition-colors">319-240-3504</span>
-            </a>
-            <a href="https://www.linkedin.com/in/cooperhoy" target="_blank" class="flex items-center gap-3 p-3.5 rounded-lg bg-white/[0.02] border border-white/[0.06] hover:border-cyber-amber/40 transition-all group col-span-2">
-              <span class="text-lg">&#128279;</span><span class="font-mono text-xs text-gray-400 group-hover:text-cyber-amber transition-colors">LinkedIn</span>
-            </a>
-          </div>
-          <div class="font-mono text-[11px] text-gray-500 p-3 rounded bg-black/30 border border-white/[0.03]">
-            <p>64 bytes from cooper: icmp_seq=1 ttl=64 time=0.042ms</p>
-            <p>Ames, Iowa &bull; Iowa State University</p>
-            <p class="mt-1">--- cooper is <span class="text-cyber-green font-bold" style="text-shadow:0 0 10px rgba(0,255,136,0.4);">ONLINE</span> ---</p>
-          </div>
-        </div>
-      </div>
-    </section>
+  <footer class="py-10 text-center text-xs text-gray-600 border-t border-white/5">
+    © 2026 Cooper Hoy
+  </footer>
 
-    <!-- Footer -->
-    <section class="relative py-20 text-center border-t border-white/[0.03]">
-      <p class="font-mono text-xs text-gray-600 tracking-[3px]">&copy; 2026 COOPER HOY &mdash; BUILT WITH RAW INFRASTRUCTURE</p>
-      <p class="font-mono text-[10px] text-gray-800 mt-2">$ sudo shutdown -h now</p>
-    </section>
-  </div>
-
-  <!-- Spin hint -->
-  <div class="spin-hint" id="spin-hint">
-    <p class="font-mono text-[10px] text-gray-500 tracking-[3px] flex items-center gap-3">
-      <span class="text-gray-600">&larr;</span> ARROW KEYS TO SPIN <span class="text-gray-600">&rarr;</span>
-    </p>
-  </div>
-
-  <script src="script.js"></script>
 </body>
 </html>
