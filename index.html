@@ -3,242 +3,264 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cooper Hoy | Infrastructure Engineer</title>
+  <title>Cooper Hoy</title>
 
+  <!-- Tailwind (layout only) -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            cyber: {
-              green: '#00ff88',
-              blue: '#00ccff',
-              amber: '#ffaa00'
-            }
-          },
-          fontFamily: {
-            mono: ['"JetBrains Mono"', 'monospace'],
-            sans: ['"Inter"', 'system-ui', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Vendor (used by script.js) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-  <style>
-    body {
-      background: #0f172a;
-      color: #e5e7eb;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(18px);
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-
-    /* Mobile Optimizations */
-    @media (max-width: 768px) {
-      #three-canvas {
-        display: none;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <!-- HERO -->
-  <section class="min-h-screen flex items-center justify-center text-center px-6">
-    <div class="max-w-3xl">
-      <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">
-        Cooper Hoy
-      </h1>
-
-      <p class="text-cyber-blue uppercase tracking-wide text-sm mb-4">
-        Infrastructure Engineer | Cyber Security Engineering Student
-      </p>
-
-      <p class="text-gray-400 leading-relaxed mb-8">
-        I build secure virtualization environments, hardened identity systems, 
-        and production infrastructure focused on uptime and resilience.
-      </p>
-
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
-        <a href="mailto:cjhoy@iastate.edu"
-           class="px-6 py-3 rounded bg-cyber-blue text-black font-semibold hover:opacity-90 transition">
-           Contact Me
-        </a>
-
-        <a href="https://www.linkedin.com/in/cooperhoy"
-           target="_blank"
-           class="px-6 py-3 rounded border border-white/20 hover:border-cyber-blue transition">
-           LinkedIn
-        </a>
+  <!-- LOADING -->
+  <div id="loading" aria-live="polite" aria-busy="true">
+    <div class="load-wrap">
+      <p class="load-kicker">Loading</p>
+      <div class="load-bar" role="progressbar" aria-label="Loading progress">
+        <div class="load-bar-inner" id="load-progress"></div>
       </div>
+      <p class="load-status" id="load-status">Preparing scene…</p>
     </div>
-  </section>
+  </div>
 
-  <!-- WHAT I BUILD -->
-  <section class="py-20 px-6 text-center border-t border-white/5">
-    <div class="max-w-3xl mx-auto">
-      <h2 class="text-2xl font-semibold text-white mb-6">
-        What I Build
-      </h2>
+  <!-- 3D -->
+  <canvas id="three-canvas" aria-hidden="true"></canvas>
 
-      <p class="text-gray-400 leading-relaxed">
-        Secure Windows Server environments deployed in VMware clusters.
-        Hardened Active Directory baselines using Group Policy.
-        Isolated sandbox infrastructure for testing without production risk.
-        Reliable systems engineered for 99.9% uptime.
-      </p>
-    </div>
-  </section>
+  <!-- UI -->
+  <div id="ui-layer">
 
-  <!-- EXPERIENCE -->
-  <section class="py-20 px-6 border-t border-white/5">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-2xl font-semibold text-white mb-10 text-center">
-        Professional Experience
-      </h2>
+    <!-- HERO -->
+    <section id="hero" class="h-screen flex items-center">
+      <div class="mx-auto max-w-5xl px-6 w-full">
+        <p class="kicker mb-4">Infrastructure Engineer</p>
 
-      <div class="space-y-10">
+        <h1 class="title mb-5">Cooper Hoy</h1>
 
-        <div class="glass-card p-8 rounded-xl">
-          <div class="flex justify-between flex-wrap gap-2 mb-3">
-            <h3 class="text-lg font-semibold text-white">
-              IT Infrastructure Engineer
-            </h3>
-            <span class="text-gray-500 text-sm">
-              2024 – 2026
-            </span>
+        <p class="subtitle max-w-2xl" id="tagline-text">
+          I build resilient virtualization and identity systems with clean baselines, strong access control, and uptime that actually holds.
+        </p>
+
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a class="btn" href="mailto:cjhoy@iastate.edu">Email</a>
+          <a class="btn ghost" href="https://www.linkedin.com/in/cooperhoy" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a class="btn ghost" href="https://cooper-hoy.com" target="_blank" rel="noreferrer">Website</a>
+        </div>
+
+        <div class="scroll-hint mt-14">
+          <span>Scroll</span>
+          <span class="dot"></span>
+          <span>Explore</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RACK INTRO (kept for scroll timing) -->
+    <section id="rack-intro" class="server-section"></section>
+
+    <!-- 0: About -->
+    <section id="section-0" class="server-section">
+      <div class="server-panel" id="panel-0">
+        <div class="card">
+          <div class="card-top">
+            <h2 class="card-title">About</h2>
+            <span class="card-chip">Ames, IA</span>
           </div>
 
-          <p class="text-gray-500 text-sm mb-4">
-            Cambridge Investments & Research • Fairfield, IA
+          <p class="card-body">
+            IT Infrastructure Engineer on a Hyper-Converged Infrastructure team. I design and deploy Windows Server environments inside VMware, harden identity with Group Policy, and build safe sandbox clones of production Active Directory to test new tools without risk.
           </p>
 
-          <ul class="text-gray-400 space-y-2 text-sm">
-            <li>Designed and deployed Windows Server 2025 within VMware clusters supporting Active Directory and file services.</li>
-            <li>Built isolated AD sandbox environments to test new products without impacting production systems.</li>
-            <li>Developed and enforced hardened Group Policy baselines across endpoints.</li>
-            <li>Maintained Exchange infrastructure and monitored system health to sustain 99.9% uptime.</li>
-          </ul>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-value">99.9%</div>
+              <div class="stat-label">Uptime target</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">HCI</div>
+              <div class="stat-label">VMware + AD</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">2027</div>
+              <div class="stat-label">ISU (est.)</div>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="glass-card p-8 rounded-xl">
-          <div class="flex justify-between flex-wrap gap-2 mb-3">
-            <h3 class="text-lg font-semibold text-white">
-              Senior Technical Support Analyst
-            </h3>
-            <span class="text-gray-500 text-sm">
-              2023 – Present
-            </span>
+    <!-- 1: Skills -->
+    <section id="section-1" class="server-section">
+      <div class="server-panel" id="panel-1">
+        <div class="card">
+          <div class="card-top">
+            <h2 class="card-title">Skills</h2>
+            <span class="card-chip">Systems + Security</span>
           </div>
 
-          <p class="text-gray-500 text-sm mb-4">
-            Iowa State University • Ames, IA
-          </p>
-
-          <ul class="text-gray-400 space-y-2 text-sm">
-            <li>Transitioned the helpdesk to modern tools and workflows, reducing ticket resolution time.</li>
-            <li>Created technical knowledge base documentation improving first-call resolution rates.</li>
-            <li>Collaborated across IT teams to resolve complex incidents and minimize service disruption.</li>
-            <li>Mentored new hires and accelerated onboarding through structured training.</li>
-          </ul>
+          <div class="pill-grid">
+            <span class="pill">Windows Server</span>
+            <span class="pill">Active Directory</span>
+            <span class="pill">Group Policy</span>
+            <span class="pill">VMware</span>
+            <span class="pill">Hyper-V</span>
+            <span class="pill">Linux</span>
+            <span class="pill">PowerShell</span>
+            <span class="pill">Python</span>
+            <span class="pill">Git</span>
+            <span class="pill">LangChain</span>
+            <span class="pill">Exchange</span>
+            <span class="pill">Cryptography</span>
+            <span class="pill">Network Config</span>
+            <span class="pill">Automation</span>
+          </div>
         </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- PROJECTS -->
-  <section class="py-20 px-6 border-t border-white/5">
-    <div class="max-w-4xl mx-auto">
-      <h2 class="text-2xl font-semibold text-white mb-10 text-center">
-        Projects
-      </h2>
+    <!-- 2: Experience -->
+    <section id="section-2" class="server-section">
+      <div class="server-panel" id="panel-2">
+        <div class="card">
+          <div class="card-top">
+            <h2 class="card-title">Experience</h2>
+            <span class="card-chip">2023 — Now</span>
+          </div>
 
-      <div class="grid md:grid-cols-2 gap-8">
+          <div class="timeline">
+            <div class="tl-item">
+              <div class="tl-top">
+                <div class="tl-role">IT Infrastructure Engineer</div>
+                <div class="tl-dates">2024 — 2026</div>
+              </div>
+              <div class="tl-org">Cambridge Investments &amp; Research · Fairfield, IA</div>
+              <p class="tl-text">
+                Deployed Windows Server 2025 in VMware clusters supporting Active Directory and file services. Built an isolated AD sandbox for product evaluation. Implemented hardening GPO baselines and maintained Exchange health with 99.9% uptime.
+              </p>
+            </div>
 
-        <div class="glass-card p-6 rounded-xl">
-          <h3 class="text-cyber-green font-semibold mb-2">
-            W@v3 Encryption
-          </h3>
-          <p class="text-gray-400 text-sm leading-relaxed mb-4">
-            Python-based encryption engine that embeds secured data into .wav files using Scrypt key derivation.
-            Includes tamper detection that deletes files after unauthorized salt modification.
-          </p>
-          <p class="text-xs text-gray-500">
-            Python • Scrypt • Steganography
-          </p>
+            <div class="tl-item">
+              <div class="tl-top">
+                <div class="tl-role">Senior Technical Support Analyst</div>
+                <div class="tl-dates">2023 — Present</div>
+              </div>
+              <div class="tl-org">Iowa State University · Ames, IA</div>
+              <p class="tl-text">
+                Modernized helpdesk workflows and documentation to speed resolution and raise first-call accuracy. Partnered across IT teams on incidents and trained new hires to ramp faster.
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="glass-card p-6 rounded-xl">
-          <h3 class="text-cyber-blue font-semibold mb-2">
-            HelpLLama
-          </h3>
-          <p class="text-gray-400 text-sm leading-relaxed mb-4">
-            Locally hosted chatbot that parses internal documentation and ticket history to deliver context-aware support responses.
-            Supports structured parsing for .docx, .pdf, and .txt.
-          </p>
-          <p class="text-xs text-gray-500">
-            Python • LangChain • LLM
-          </p>
+    <!-- 3: Projects -->
+    <section id="section-3" class="server-section">
+      <div class="server-panel" id="panel-3">
+        <div class="card">
+          <div class="card-top">
+            <h2 class="card-title">Projects</h2>
+            <span class="card-chip">Selected</span>
+          </div>
+
+          <div class="project">
+            <div class="proj-title">W@v3 Encryption</div>
+            <div class="proj-meta">wav3.fit · 2025</div>
+            <p class="proj-text">
+              Python encryption engine that embeds secured data into WAV audio using Scrypt key derivation. Includes tamper detection that invalidates data after unauthorized salt changes.
+            </p>
+            <div class="proj-tags">
+              <span class="tag">Python</span><span class="tag">Scrypt</span><span class="tag">Stealth storage</span>
+            </div>
+          </div>
+
+          <div class="project">
+            <div class="proj-title">HelpLLama</div>
+            <div class="proj-meta">2025</div>
+            <p class="proj-text">
+              Locally hosted support chatbot that parses internal docs and ticket history for fast, context-aware answers. Supports structured parsing across DOCX, PDF, and TXT.
+            </p>
+            <div class="proj-tags">
+              <span class="tag">Python</span><span class="tag">LangChain</span><span class="tag">RAG</span>
+            </div>
+          </div>
+
+          <div class="project">
+            <div class="proj-title">Enterprise Lab</div>
+            <div class="proj-meta">Iowa State University</div>
+            <p class="proj-text">
+              Built an enterprise-style environment: LDAP, DNS, domain services, web, mail, and security servers — used for hardening and attack simulation.
+            </p>
+            <div class="proj-tags">
+              <span class="tag">LDAP</span><span class="tag">DNS</span><span class="tag">Hardening</span>
+            </div>
+          </div>
+
         </div>
-
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- EDUCATION -->
-  <section class="py-20 px-6 border-t border-white/5">
-    <div class="max-w-3xl mx-auto text-center">
-      <h2 class="text-2xl font-semibold text-white mb-6">
-        Education
-      </h2>
+    <!-- 4: Education -->
+    <section id="section-4" class="server-section">
+      <div class="server-panel" id="panel-4">
+        <div class="card">
+          <div class="card-top">
+            <h2 class="card-title">Education</h2>
+            <span class="card-chip">ISU</span>
+          </div>
 
-      <p class="text-white font-medium">
-        B.S. Cyber Security Engineering
-      </p>
-
-      <p class="text-gray-500 mb-4">
-        Iowa State University • 2023 – 2027 (est.)
-      </p>
-
-      <p class="text-gray-400 text-sm">
-        Coursework: Data Structures & Algorithms, Embedded Systems, Intro to Cybersecurity
-      </p>
-    </div>
-  </section>
-
-  <!-- CONTACT -->
-  <section class="py-20 px-6 border-t border-white/5 text-center">
-    <div class="max-w-xl mx-auto">
-      <h2 class="text-2xl font-semibold text-white mb-6">
-        Contact
-      </h2>
-
-      <p class="text-gray-400 mb-6">
-        Open to infrastructure, cybersecurity, and systems engineering opportunities.
-      </p>
-
-      <div class="space-y-3 text-gray-300">
-        <p>Email: cjhoy@iastate.edu</p>
-        <p>Phone: 319-240-3504</p>
-        <p>Location: Ames, Iowa</p>
+          <div class="edu">
+            <div class="edu-degree">B.S. Cyber Security Engineering</div>
+            <div class="edu-meta">Iowa State University · 2023 — 2027 (est.)</div>
+            <div class="edu-text">
+              Relevant coursework: Data Structures &amp; Algorithms, Embedded Systems, Intro to Cybersecurity.
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer class="py-10 text-center text-xs text-gray-600 border-t border-white/5">
-    © 2026 Cooper Hoy
-  </footer>
+    <!-- 5: Contact -->
+    <section id="section-5" class="server-section">
+      <div class="server-panel" id="panel-5">
+        <div class="card">
+          <div class="card-top">
+            <h2 class="card-title">Contact</h2>
+            <span class="card-chip">Open to roles</span>
+          </div>
 
+          <div class="contact-grid">
+            <a class="contact-row" href="mailto:cjhoy@iastate.edu">cjhoy@iastate.edu</a>
+            <a class="contact-row" href="tel:+13192403504">+1 (319) 240-3504</a>
+            <a class="contact-row" href="https://cooper-hoy.com" target="_blank" rel="noreferrer">cooper-hoy.com</a>
+            <a class="contact-row" href="https://www.linkedin.com/in/cooperhoy" target="_blank" rel="noreferrer">linkedin.com/in/cooperhoy</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <section class="footer">
+      <p>© 2026 Cooper Hoy</p>
+    </section>
+
+  </div>
+
+  <!-- Spin hint -->
+  <div class="spin-hint" id="spin-hint">
+    <p>Use ← → to rotate</p>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
